@@ -12,7 +12,7 @@ echo ""
 
 # Configuration
 APP_DIR="/var/www/library-app"
-DOMAIN="your-domain.com"  # Ganti dengan domain Anda
+DOMAIN="perpus.irf4n.my.id"  # Ganti dengan domain Anda
 DB_NAME="library_db"
 DB_USER="library_user"
 DB_PASSWORD=""  # Akan di-generate otomatis
