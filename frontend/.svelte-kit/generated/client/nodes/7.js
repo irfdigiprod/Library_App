@@ -1,0 +1,1 @@
+export { default as component } from "../../../../src/routes/my-borrowings/+page.svelte";
