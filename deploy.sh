@@ -124,6 +124,31 @@ else
     echo "PUBLIC_API_URL=http://localhost:3000" > .env
 fi
 
+# Install adapter-node for VPS deployment
+# adapter-auto does not detect plain VPS (no cloud env vars), so we use adapter-node
+log_info "Installing @sveltejs/adapter-node..."
+bun add -D @sveltejs/adapter-node@5
+
+# Update svelte.config.js to use adapter-node instead of adapter-auto
+cat > ${APP_DIR}/frontend/svelte.config.js <<ADAPTERCONFIG
+import adapter from "@sveltejs/adapter-node";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+
+/** @type {import("@sveltejs/kit").Config} */
+const config = {
+	preprocess: vitePreprocess(),
+	kit: {
+		adapter: adapter({
+			env: {
+				public: {}
+			}
+		})
+	}
+};
+
+export default config;
+ADAPTERCONFIG
+
 bun install
 bun run build
 log_info "Frontend built successfully"
@@ -140,7 +165,7 @@ module.exports = {
       name: 'library-backend',
       cwd: '${APP_DIR}/backend',
       script: 'bun',
-      args: 'run dev',
+      args: 'run start',
       env: {
         NODE_ENV: 'production',
         PORT: 3000
@@ -155,11 +180,12 @@ module.exports = {
     {
       name: 'library-frontend',
       cwd: '${APP_DIR}/frontend',
-      script: 'bun',
-      args: 'run start',
+      script: 'node',
+      args: 'build/index.js',
       env: {
         NODE_ENV: 'production',
-        PORT: 3001
+        PORT: 3001,
+        HOST: '0.0.0.0'
       },
       instances: 1,
       autorestart: true,
